@@ -1,6 +1,7 @@
 from functions.get_files_info import get_files_info
 from functions.get_file_contents import get_file_contents
 from functions.write_files import write_files
+from functions.run_python import run_python_file
 
 # checks for dir children
 dir_check = [
@@ -35,7 +36,21 @@ file_write_check = [
     ("calculator", "/tmp/temp.txt", "this should not be allowed"),
 ]
 
-for wp, file, content in file_write_check:
+# for wp, file, content in file_write_check:
+#     print(f"""Result for {file}
+# {write_files(wp, file, content)}
+# """)
+
+# check for call python of file
+
+run_file = [
+    ("calculator", "main.py"),
+    ("calculator", "tests.py"),
+    ("calculator", "../main.py"),
+    ("calculator", "nonexistent.py"),
+]
+
+for wp, file in run_file:
     print(f"""Result for {file}
-{write_files(wp, file, content)}
+{run_python_file(wp, file)}
 """)
