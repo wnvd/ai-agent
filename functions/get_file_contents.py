@@ -14,7 +14,11 @@ def get_file_contents(workding_directory, file_path):
         return f'Error: File not found or is not a regular file: "{file_path}"'
     try:
         with open(os.path.abspath(path)) as f:
-            file_content_string = f.read(MAX_CHARACTERS)
-            return file_content_string
+            content = f.read(MAX_CHARACTERS)
+            if os.path.getsize(os.path.abspath(path)) > MAX_CHARACTERS:
+                content += (
+                    f'[...File "{file_path}" truncated at ({MAX_CHARACTERS}) characters"]'
+                )
+            return content
     except Exception as e:
         return f'Error: {e}'
