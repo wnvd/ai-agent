@@ -1,5 +1,6 @@
 from functions.get_files_info import get_files_info
 from functions.get_file_contents import get_file_contents
+from functions.write_files import write_files
 
 # checks for dir children
 dir_check = [
@@ -22,7 +23,19 @@ file_content_check = [
     ("calculator", "/bin/cat/"),
 ]
 
-for wp, file in file_content_check:
+# for wp, file in file_content_check:
+#     print(f"""Result for {file}
+# {get_file_contents(wp, file)}
+# """)
+
+# Check for file writes
+file_write_check = [
+    ("calculator", "lorem.txt", "wait, this isn't lorem ipsum"),
+    ("calculator", "pkg.morelorem.txt", "lorem ipsum dolor sit amet"),
+    ("calculator", "/tmp/temp.txt", "this should not be allowed"),
+]
+
+for wp, file, content in file_write_check:
     print(f"""Result for {file}
-{get_file_contents(wp, file)}
+{write_files(wp, file, content)}
 """)
