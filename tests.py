@@ -50,7 +50,11 @@ run_file = [
     ("calculator", "nonexistent.py"),
 ]
 
-for wp, file in run_file:
-    print(f"""Result for {file}
-{run_python_file(wp, file)}
-""")
+# for wp, file in run_file:
+#     print(f"""Result for {file}
+# {run_python_file(wp, file)}
+# """)
+
+# check for if LLM knows about file structure (manually)
+# uv run main.py "what files are in the root?",
+# uv run main.py "What files are in the pkg directory?",
