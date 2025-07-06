@@ -4,10 +4,10 @@ from google import genai
 from google.genai import types
 import sys
 
-from functions.get_files_info import schema_get_files_info
-from functions.get_file_contents import schema_get_file_content
-from functions.run_python import schema_run_python_file
-from functions.write_files import schema_write_python_file
+from functions.get_files_info import schema_get_files_info, get_files_info
+from functions.get_file_contents import schema_get_file_content, get_file_contents
+from functions.run_python import schema_run_python_file, run_python_file
+from functions.write_files import schema_write_python_file, write_files
 
 system_prompt = """
 You are a helpful AI coding agent.
@@ -41,6 +41,75 @@ available_functions = types.Tool(
     ]
 )
 
+available_function_dic = {
+    "get_files_info": get_files_info,
+    "get_file_contents": get_file_contents,
+    "run_python_file": run_python_file,
+    "write_files": write_files,
+}
+
+
+def generate_content(client, messages, user_prompt, is_verbose):
+    response = client.models.generate_content(
+        model="gemini-2.0-flash-001",
+        contents=messages,
+        config=types.GenerateContentConfig(
+            tools=[available_functions],
+            system_instruction=system_prompt,
+        ),
+    )
+
+    if is_verbose:
+        verbose_output(user_prompt, response)
+    print("")
+    if not response.function_calls:
+        print(response.text)
+    print("")
+    if response.function_calls is not None:
+        for function_call in response.function_calls:
+            function_call_result = called_function(function_call, is_verbose)
+            if function_call_result is None:
+                raise Exception(f"result from called function is None")
+            if is_verbose:
+                print(
+                    f"-> {function_call_result.parts[0].function_response.response}")
+
+
+def called_function(function_call_part, is_verbose):
+
+    function_name = function_call_part.name
+    function_args = function_call_part.args
+
+    if is_verbose:
+        print(f"Calling function: {function_name}({function_args})")
+    else:
+        print(f" - Calling function: {function_call_part.name}")
+
+    if function_name not in available_function_dic:
+        return types.Content(
+            role="tool",
+            parts=[
+                types.Part.from_function_response(
+                    name=function_name,
+                    response={"error": f"Unknown function: {function_name}"},
+                )
+            ],
+        )
+
+    working_directory = "./calculator"
+    function_result = available_function_dic[function_name](
+        working_directory, **function_args)
+
+    return types.Content(
+        role="tool",
+        parts=[
+            types.Part.from_function_response(
+                name=function_name,
+                response={"result": function_result},
+            )
+        ],
+    )
+
 
 def main():
     load_dotenv()
@@ -61,25 +130,8 @@ def main():
         types.Content(role="user", parts=[types.Part(text=user_prompt)])
     ]
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-001",
-        contents=messages,
-        config=types.GenerateContentConfig(
-            tools=[available_functions],
-            system_instruction=system_prompt,
-        ),
-    )
+    generate_content(client, messages, user_prompt, is_verbose)
 
-    if is_verbose:
-        verbose_output(user_prompt, response)
-    print("")
-    if not response.function_calls:
-        print(response.text)
-    print("")
-    if response.function_calls is not None:
-        for called_function in response.function_calls:
-            print(f"Calling function: {
-                  called_function.name}({called_function.args})")
 
 if __name__ == "__main__":
     main()
