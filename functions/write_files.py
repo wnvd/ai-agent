@@ -32,6 +32,5 @@ schema_write_python_file = types.FunctionDeclaration(
                 description="Content that needs to be written inside the file whose path is provided"
             )
         },
-        required=["file_path", "content"]
     )
 )

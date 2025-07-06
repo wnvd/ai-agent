@@ -18,7 +18,8 @@ def get_file_contents(workding_directory, file_path):
             content = f.read(MAX_CHARACTERS)
             if os.path.getsize(os.path.abspath(path)) > MAX_CHARACTERS:
                 content += (
-                    f'[...File "{file_path}" truncated at ({MAX_CHARACTERS}) characters"]'
+                    f'[...File "{
+                        file_path}" truncated at ({MAX_CHARACTERS}) characters"]'
                 )
             return content
     except Exception as e:
@@ -36,6 +37,5 @@ schema_get_file_content = types.FunctionDeclaration(
                 description="The directory is where the file is, it is relative and if not provided the file is inside the current working directory."
             )
         },
-        required=["file_path"]
     )
 )
