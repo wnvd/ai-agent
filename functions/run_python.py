@@ -48,18 +48,10 @@ schema_run_python_file = types.FunctionDeclaration(
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-         "file_path": types.Schema(
+         "file": types.Schema(
                 type=types.Type.STRING,
-                description="Path to the Python file to execute, relative to the working directory.",
-         ),
-            "args": types.Schema(
-             type=types.Type.ARRAY,
-             items=types.Schema(
-                 type=types.Type.STRING,
-                 description="Optional arguments to pass to the Python file.",
-             ),
-             description="Optional arguments to pass to the Python file.",
-         ),
+                description="Name of the file that needs to be executed.",
+         )
         },
     )
 )

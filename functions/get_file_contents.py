@@ -4,9 +4,9 @@ from google.genai import types
 MAX_CHARACTERS = 10000
 
 
-def get_file_contents(workding_directory, file_path):
-    allowed_path = os.path.abspath(workding_directory)
-    path = os.path.join(workding_directory, file_path)
+def get_file_contents(working_directory, file_path):
+    allowed_path = os.path.abspath(working_directory)
+    path = os.path.join(working_directory, file_path)
 
     if not os.path.abspath(path).startswith(allowed_path):
         return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
@@ -32,10 +32,10 @@ schema_get_file_content = types.FunctionDeclaration(
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-            "directory": types.Schema(
+            "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="The directory is where the file is, it is relative and if not provided the file is inside the current working directory."
-            )
+                description="The path to the file whose content should be read, relative to the working directory.",
+            ),
         },
     )
 )
