@@ -50,29 +50,45 @@ available_function_dic = {
 
 
 def generate_content(client, messages, user_prompt, is_verbose):
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-001",
-        contents=messages,
-        config=types.GenerateContentConfig(
-            tools=[available_functions],
-            system_instruction=system_prompt,
-        ),
-    )
+    for _ in range(20):
+        response = client.models.generate_content(
+            model="gemini-2.0-flash-001",
+            contents=messages,
+            config=types.GenerateContentConfig(
+                tools=[available_functions],
+                system_instruction=system_prompt,
+            ),
+        )
 
-    if is_verbose:
-        verbose_output(user_prompt, response)
-    print("")
-    if not response.function_calls:
-        print(response.text)
-    print("")
-    if response.function_calls is not None:
-        for function_call in response.function_calls:
-            function_call_result = called_function(function_call, is_verbose)
-            if function_call_result is None:
-                raise Exception(f"result from called function is None")
-            if is_verbose:
-                print(
-                    f"-> {function_call_result.parts[0].function_response.response}")
+        # iterating response.condidates and appending
+        # messages list for AI context
+        if response.candidates is not None:
+            for candidate in response.candidates:
+                messages.append(candidate.content)
+
+        if is_verbose:
+            verbose_output(user_prompt, response)
+
+        if not response.function_calls:
+            print(f"\n{response.text}\n")
+            break
+
+        if response.function_calls is not None:
+            for function_call in response.function_calls:
+                function_call_result = called_function(
+                    function_call, is_verbose)
+
+                # appending type.Content to messages list for AI context
+                messages.append(function_call_result)
+
+                if function_call_result is None:
+                    raise Exception(f"result from called function is None")
+                if is_verbose:
+                    print(
+                        f"-> {function_call_result.parts[0].function_response.response}")
+        else:
+            print(f"\n{response.text}\n")
+            break
 
 
 def called_function(function_call_part, is_verbose):
