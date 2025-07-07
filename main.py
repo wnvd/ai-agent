@@ -32,6 +32,8 @@ def verbose_output(user_prompt, response):
     print("Response tokens:", response.usage_metadata.candidates_token_count)
 
 
+# Schemas of functions that provided LLMs
+# with context how they work
 available_functions = types.Tool(
     function_declarations=[
         schema_get_files_info,
@@ -112,6 +114,8 @@ def called_function(function_call_part, is_verbose):
             ],
         )
 
+    # workding directory is hard coded
+    # so LLM does not do anything stupid
     working_directory = "./calculator"
     function_result = available_function_dic[function_name](
         working_directory, **function_args)
